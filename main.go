@@ -23,6 +23,9 @@ func main() {
 	get(*urlFlag)
 }
 
+// get takes in the url given by the user, makes a GET request,
+// determines the base url, and passes the response body and url to our hrefs function,
+// returning a slice of hrefs
 func get(urlStr string) []string {
 	resp, err := http.Get(urlStr)
 	check(err)
@@ -41,6 +44,10 @@ func get(urlStr string) []string {
 	return hrefs(resp.Body, base)
 }
 
+// hrefs takes in the response body and base url,
+// uses link.Parse to get all the links,
+// then checks the links, adding the domain if needed
+// and returns a slice of hrefs (links)
 func hrefs(r io.Reader, base string) []string {
 	// use the link parsing package from previous exercise
 	// returns a slice of links
