@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 	"gophercises/link"
+	"io"
 	"log"
 	"net/http"
 	"net/url"
@@ -15,8 +16,15 @@ import (
 func main() {
 	urlFlag := flag.String("url", "https://gophercises.com", "the url that you want to build a sitemap for")
 	flag.Parse()
+	pages := get(*urlFlag)
+	for _, page := range pages {
+		fmt.Println(page)
+	}
+	get(*urlFlag)
+}
 
-	resp, err := http.Get(*urlFlag)
+func get(urlStr string) []string {
+	resp, err := http.Get(urlStr)
 	check(err)
 	defer resp.Body.Close()
 
@@ -30,24 +38,25 @@ func main() {
 		Host:   reqURL.Host,
 	}
 	base := baseURL.String()
+	return hrefs(resp.Body, base)
+}
 
+func hrefs(r io.Reader, base string) []string {
 	// use the link parsing package from previous exercise
 	// returns a slice of links
-	links, _ := link.Parse(resp.Body)
-	var hrefs []string
+	links, _ := link.Parse(r)
+	var hrefsSlice []string
 	// need to add domain to paths -> /some-path
 	// need to deal with fragment or mailto links
 	for _, ll := range links {
 		switch {
 		case strings.HasPrefix(ll.Href, "/"):
-			hrefs = append(hrefs, base+ll.Href)
+			hrefsSlice = append(hrefsSlice, base+ll.Href)
 		case strings.HasPrefix(ll.Href, "http"):
-			hrefs = append(hrefs, ll.Href)
+			hrefsSlice = append(hrefsSlice, ll.Href)
 		}
 	}
-	for _, href := range hrefs {
-		fmt.Println(href)
-	}
+	return hrefsSlice
 }
 
 func check(err error) {
