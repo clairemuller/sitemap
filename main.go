@@ -20,18 +20,23 @@ func main() {
 	check(err)
 	defer resp.Body.Close()
 
-	// need to add domain to paths -> /some-path
-	// need to deal with fragment or mailto links
-	reqUrl := resp.Request.URL
-	baseUrl := &url.URL{
-		Scheme: reqUrl.Scheme,
-		Host:   reqUrl.Host,
+	// want to use the request url from the response
+	// in case the site that the user passes in redirects
+	reqURL := resp.Request.URL
+	// baseURL will be just the domain
+	// in case the user passed in url with paths
+	baseURL := &url.URL{
+		Scheme: reqURL.Scheme,
+		Host:   reqURL.Host,
 	}
-	base := baseUrl.String()
+	base := baseURL.String()
 
 	// use the link parsing package from previous exercise
+	// returns a slice of links
 	links, _ := link.Parse(resp.Body)
 	var hrefs []string
+	// need to add domain to paths -> /some-path
+	// need to deal with fragment or mailto links
 	for _, ll := range links {
 		switch {
 		case strings.HasPrefix(ll.Href, "/"):
