@@ -41,7 +41,7 @@ func get(urlStr string) []string {
 		Host:   reqURL.Host,
 	}
 	base := baseURL.String()
-	return hrefs(resp.Body, base)
+	return filter(base, hrefs(resp.Body, base))
 }
 
 // hrefs takes in the response body and base url,
@@ -64,6 +64,17 @@ func hrefs(r io.Reader, base string) []string {
 		}
 	}
 	return hrefsSlice
+}
+
+// filter out any links that don't have the base url
+func filter(base string, links []string) []string {
+	var linksSlice []string
+	for _, link := range links {
+		if strings.HasPrefix(link, base) {
+			linksSlice = append(linksSlice, link)
+		}
+	}
+	return linksSlice
 }
 
 func check(err error) {
