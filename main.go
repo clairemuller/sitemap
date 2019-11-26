@@ -20,7 +20,6 @@ func main() {
 	for _, page := range pages {
 		fmt.Println(page)
 	}
-	get(*urlFlag)
 }
 
 // get takes in the url given by the user, makes a GET request,
@@ -41,7 +40,8 @@ func get(urlStr string) []string {
 		Host:   reqURL.Host,
 	}
 	base := baseURL.String()
-	return filter(base, hrefs(resp.Body, base))
+	links := hrefs(resp.Body, base)
+	return filter(base, links)
 }
 
 // hrefs takes in the response body and base url,
@@ -88,4 +88,4 @@ func check(err error) {
 // 3. build proper urls with our links
 // 4. filter out any links with different domain
 // 5. find all pages (BFS)
-// 6. print outl xml
+// 6. print outl xml - not doing this
